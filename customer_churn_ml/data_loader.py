@@ -17,6 +17,3 @@ def load_data():
         return None
     
 
-
-test = load_data()
-print(test.head(2))
