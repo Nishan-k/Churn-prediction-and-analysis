@@ -15,8 +15,9 @@ def execute_query(query):
 
         cursor.execute(query)
         result = cursor.fetchall()
+        column_names = [desc[0] for desc in cursor.description]
 
-        return result
+        return result, column_names
     
     except psycopg2.Error as e:
         print(f"An error has occured: {e}")
@@ -27,3 +28,6 @@ def execute_query(query):
             cursor.close()
         if connection:
             connection.close()
+
+
+
