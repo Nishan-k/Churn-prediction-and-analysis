@@ -1,5 +1,5 @@
 import pandas as pd
-from db import execute_query
+from customer_churn_ml.db import execute_query
 
 
 def load_data():
@@ -18,3 +18,15 @@ def load_data():
         return None
     
 
+def churn_count():
+    """
+    Get the current count of the Churn:
+    """
+    query = "SELECT churn, COUNT(*) FROM customer GROUP BY churn;"
+    result, column_names = execute_query(query=query)
+
+    if result and column_names:
+        df = pd.DataFrame(result, columns=column_names)
+        return df
+    else:
+        return None
