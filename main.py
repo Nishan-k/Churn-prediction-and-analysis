@@ -5,50 +5,82 @@ import pandas as pd
 from PIL import Image
 from  customer_churn_ml.data_loader import churn_count
 import matplotlib.pyplot as plt
+import plotly.express as px
 
-
-
-churn_data = churn_count()
-
-
-# Define FastAPI endpoint (adjust the URL to where your FastAPI app is running)
-FASTAPI_URL = "http://localhost:8000/api/churn-prediction"
-
-# Set page configuration
+# Navigation Bar:
 st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
+st.markdown(
+    """
+    <style>
+        /* Sidebar background color */
+        [data-testid="stSidebar"] {
+            background-color: #0E4D64;
+            color: white;  
+        }
 
-# Sidebar navigation for pages
-page = st.sidebar.selectbox("Choose a page", ["Home", "Predict", "Explain", "Recommendations", "About"])
+        /* Sidebar title */
+        [data-testid="stSidebarNav"] {
+            font-size: 20px;
+            font-weight: bold;
+            color: black;
+        }
+
+        /* Dropdown menu styling */
+        select {
+            background-color: #fff;
+            color: black;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        /* Hover effect for options */
+        select option:hover {
+            background-color: #d4af37; /* Gold */
+            color: white;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+page = st.sidebar.selectbox("Choose a page", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "ℹ️ About"])
+st.sidebar.markdown("**🔍 Navigate through the sections to explore customer churn insights!**")
+
+
+
+
+
+
 image = "./images/churn.jpg"
+churn_data = churn_count()
 # Home Page
-if page == "Home":
+if page == "🏠 Home":
      
      st.title("Customer Churn Prediction Model")
-        
-     st.write("""
-        Customer Churn refers to the loss of customers over a specific period. 
-        Understanding churn is crucial for businesses as it helps identify at-risk customers, 
-        allowing proactive measures to retain them.
-        """)
-     
-     st.subheader("Current Customer Distribution")
-     col1, col2 = st.columns([9, 5])
-     with col1:        
-        plt.figure(figsize=(6, 4))
-        fig, ax = plt.subplots()
-        ax.bar(churn_data["churn"], churn_data["count"], color=['green', 'red'])
-        ax.set_xlabel("Churn Status")
-        ax.set_ylabel("Count")
-        ax.set_title("Customer Churn Distribution")
-        st.pyplot(fig)
-
+     st.write("")
+     col1, col2 = st.columns([4, 4])
+     with col1:         
+        st.write("""
+           Customer churn is the loss of customers over time. Predicting churn helps businesses 
+                 identify at-risk customers, take proactive retention measures, reduce acquisition costs, 
+                 and boost profitability through timely interventions like incentives and personalized services
+            """)
      with col2:
-         st.write(churn_data)
+         st.image(image)
+         st.write("")
+         st.write("")
+
+     st.subheader("Current Customer Distribution")
+     plt.figure(figsize=(6, 4))
+     fig = px.bar(churn_data, x='churn', y='count', color='churn')
+     st.plotly_chart(fig)
+
+    
     
 
 
 # Prediction Page
-if page == "Predict":
+if page == "📊 Predict":
     st.title("Churn Prediction")
 
     # User input fields
