@@ -6,9 +6,46 @@ from PIL import Image
 from  customer_churn_ml.data_loader import churn_count
 import matplotlib.pyplot as plt
 import plotly.express as px
+import uuid 
+
+
+st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
+
+
+##----------------------------------------------------------------------------------##
+## CSS Codes:
+
+
+## Update graph button:
+st.markdown("""
+    <style>
+        .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%; /* Ensure the container takes full height */
+        }
+        .stButton>button {
+            background-color: #4CAF50; /* Green */
+            color: white;
+            border: 2px solid #4CAF50;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .stButton>button:hover {
+            background-color: #20c942; 
+            border-color: #c2eced;
+            color: white;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
 
 # Navigation Bar:
-st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
+
 st.markdown(
     """
     <style>
@@ -43,16 +80,31 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+##----------------------------------------------------------------------------------##
+
+image = "./images/churn.jpg"
+
+def visualize_churn_data(churn_data, chart_key):
+    custom_colors = {'Yes': '#fc4903', 'No': '#03fc94'} 
+    st.subheader("Current Customer Distribution")
+    fig = px.bar(get_data(), x='churn', y='count', color='churn', color_discrete_map=custom_colors)
+    st.plotly_chart(fig, use_container_width=True, key=chart_key)
+
+
+def get_data():
+    churn_data = churn_count()
+    return churn_data
+
+
+
+
+
 page = st.sidebar.selectbox("Choose a page", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "ℹ️ About"])
 st.sidebar.markdown("**🔍 Navigate through the sections to explore customer churn insights!**")
 
 
 
 
-
-
-image = "./images/churn.jpg"
-churn_data = churn_count()
 # Home Page
 if page == "🏠 Home":
      
@@ -69,13 +121,28 @@ if page == "🏠 Home":
          st.image(image)
          st.write("")
          st.write("")
+     
 
-     st.subheader("Current Customer Distribution")
-     plt.figure(figsize=(6, 4))
-     fig = px.bar(churn_data, x='churn', y='count', color='churn')
-     st.plotly_chart(fig)
+     st.write("")
+     graph_placeholder = st.empty()
+     chart_key = f"chart_{uuid.uuid4()}"
+     with graph_placeholder.container():
+        visualize_churn_data(get_data(), chart_key=chart_key)
+     
+     st.markdown('<div class="center-container">', unsafe_allow_html=True)
+     if st.button("Update Graph"):
+        chart_key = f"chart_{uuid.uuid4()}"
 
+        with graph_placeholder.container():
+            visualize_churn_data(get_data(), chart_key=chart_key) 
+     st.markdown('</div>', unsafe_allow_html=True)
     
+     st.write("")
+     st.subheader("Current Data")
+     st.dataframe(get_data())
+     
+
+
     
 
 
