@@ -3,7 +3,7 @@ import requests
 import json 
 import pandas as pd
 from PIL import Image
-from  customer_churn_ml.data_loader import churn_count
+from customer_churn_ml.data_loader import churn_count
 import matplotlib.pyplot as plt
 import plotly.express as px
 import uuid 
@@ -99,7 +99,7 @@ def get_data():
 
 
 
-page = st.sidebar.selectbox("Choose a page", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "ℹ️ About"])
+page = st.sidebar.selectbox("", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "ℹ️ About"])
 st.sidebar.markdown("**🔍 Navigate through the sections to explore customer churn insights!**")
 
 
@@ -128,19 +128,19 @@ if page == "🏠 Home":
      chart_key = f"chart_{uuid.uuid4()}"
      with graph_placeholder.container():
         visualize_churn_data(get_data(), chart_key=chart_key)
-     
+    
+     st.write("")
+     st.subheader("Current Data")
+     st.dataframe(get_data())
+
      st.markdown('<div class="center-container">', unsafe_allow_html=True)
-     if st.button("Update Graph"):
+     if st.button("Update Data"):
         chart_key = f"chart_{uuid.uuid4()}"
 
         with graph_placeholder.container():
             visualize_churn_data(get_data(), chart_key=chart_key) 
      st.markdown('</div>', unsafe_allow_html=True)
-    
-     st.write("")
-     st.subheader("Current Data")
-     st.dataframe(get_data())
-     
+
 
 
     
@@ -149,13 +149,22 @@ if page == "🏠 Home":
 # Prediction Page
 if page == "📊 Predict":
     st.title("Churn Prediction")
+    st.write("")
+    st.write("Select Features Or Enter Data to Predict")
 
     # User input fields
-    age = st.number_input("Age", min_value=18, max_value=100, step=1)
-    contract_type = st.selectbox("Contract Type", ["Month-to-month", "One year", "Two year"])
-    tenure = st.number_input("Tenure (in months)", min_value=1, max_value=72, step=1)
-    monthly_spend = st.number_input("Monthly Spend", min_value=0.0, max_value=10000.0, step=0.1)
+    col1, col2 = st.columns([6, 6])
+
+    with col1:
+        gender = st.radio("Gender", ("Male", "Female"))
+        senior_citizen = st.radio("Is Senior Citizen?", ["Yes", "No"])
+        partner = st.radio("Does the customer have a partner (e.g., spouse or significant other)?",["Yes", "No"])
+        dependents = st.radio("Does the customer have dependents (e.g., children, spouse, or family members relying on you)?", ["Yes", "No"])
+        monthly_spend = st.number_input("Monthly Spend", min_value=0.0, max_value=10000.0, step=0.1)
     
+    with col2:
+        st.write('test')
+        
     if st.button("Predict Churn"):
         # Prepare data for API request
         payload = {
