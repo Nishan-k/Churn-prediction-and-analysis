@@ -11,12 +11,12 @@ def execute_query(query):
 
     try:
         connection = psycopg2.connect(**db_config)
+        
         cursor = connection.cursor()
 
         cursor.execute(query)
         result = cursor.fetchall()
         column_names = [desc[0] for desc in cursor.description]
-
         return result, column_names
     
     except psycopg2.Error as e:

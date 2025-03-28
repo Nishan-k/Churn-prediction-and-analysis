@@ -23,10 +23,10 @@ st.markdown("""
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100%; /* Ensure the container takes full height */
+            height: 100%;
         }
         .stButton>button {
-            background-color: #4CAF50; /* Green */
+            background-color: #4CAF50;
             color: white;
             border: 2px solid #4CAF50;
             border-radius: 12px;
@@ -34,15 +34,40 @@ st.markdown("""
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s, border-color 0.3s;
+            position: relative;
         }
         .stButton>button:hover {
-            background-color: #20c942; 
+            background-color: #20c942;
             border-color: #c2eced;
             color: white;
         }
+        /* Tooltip CSS */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 160px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 """, unsafe_allow_html=True)
-
 
 # Navigation Bar:
 
@@ -99,7 +124,7 @@ def get_data():
 
 
 
-page = st.sidebar.selectbox("", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "ℹ️ About"])
+page = st.sidebar.selectbox("Navigation Menu", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "ℹ️ About"])
 st.sidebar.markdown("**🔍 Navigate through the sections to explore customer churn insights!**")
 
 
@@ -124,24 +149,24 @@ if page == "🏠 Home":
      
 
      st.write("")
+
+
      graph_placeholder = st.empty()
+
      chart_key = f"chart_{uuid.uuid4()}"
      with graph_placeholder.container():
         visualize_churn_data(get_data(), chart_key=chart_key)
-    
-     st.write("")
-     st.subheader("Current Data")
-     st.dataframe(get_data())
 
-     st.markdown('<div class="center-container">', unsafe_allow_html=True)
-     if st.button("Update Data"):
+
+
+     if st.button("Update Graph"):  
         chart_key = f"chart_{uuid.uuid4()}"
-
         with graph_placeholder.container():
-            visualize_churn_data(get_data(), chart_key=chart_key) 
-     st.markdown('</div>', unsafe_allow_html=True)
+            visualize_churn_data(get_data(), chart_key=chart_key)
 
+     st.markdown("</div>", unsafe_allow_html=True)
 
+ 
 
     
 
@@ -150,28 +175,41 @@ if page == "🏠 Home":
 if page == "📊 Predict":
     st.title("Churn Prediction")
     st.write("")
-    st.write("Select Features Or Enter Data to Predict")
+    st.subheader("Select Features Or Enter Data to Predict:")
+    st.write("")
 
     # User input fields
     col1, col2 = st.columns([6, 6])
 
     with col1:
-        gender = st.radio("Gender", ("Male", "Female"))
+        gender = st.radio("Gender:", ("Male", "Female"))
         senior_citizen = st.radio("Is Senior Citizen?", ["Yes", "No"])
         partner = st.radio("Does the customer have a partner (e.g., spouse or significant other)?",["Yes", "No"])
         dependents = st.radio("Does the customer have dependents (e.g., children, spouse, or family members relying on you)?", ["Yes", "No"])
-        monthly_spend = st.number_input("Monthly Spend", min_value=0.0, max_value=10000.0, step=0.1)
+        tenure = st.number_input("Tenure (In Months):", min_value=1, max_value=100, step=1)
+        phone_service = st.radio("Has Phone Service?", ["Yes", "No"])
+        multiple_lines = st.radio("Has Multiple Lines?", ["Yes", "No"])
+        internet_service = st.selectbox("Internet Service:", ["DSL", "Fibre optic", "No"])
+        online_security = st.selectbox("Has intenet security?", ["Yes", "No","No internet service"])
+        
     
     with col2:
-        st.write('test')
+        online_backup = st.selectbox("Has online backup?", ["Yes", "No", "No internet service"])
+        device_protection = st.selectbox("Has Device Protection?", ["Yes", "No", "No internet service"])
+        tech_support = st.selectbox("Has Tech Support?", ["Yes", "No", "No internet service"])
+        streaming_tv = st.selectbox("Has Streaming TV?", ["Yes", "No", "No internet service"])
+        contract = st.radio("Contract Type:", ("One year", "Month-to-month", "Two year"))
+        paperless_billing = st.radio("Has Paperless Billing?", ("Yes", "No"))
+        payment_method = st.selectbox("Payment Method:", ["Mailed check", "Bank transfer (automatic)", "Electronic check", "Credit card (automatic)"])
+        monthly_charges = st.number_input("Monthly Charge:", min_value=18.95, max_value=130.0, step=0.1)
+        total_charges = st.number_input("Total Charge:", min_value=35.0, max_value=7900.0, step=0.1)
+
+
         
     if st.button("Predict Churn"):
         # Prepare data for API request
         payload = {
-            "age": age,
-            "contract_type": contract_type,
-            "tenure": tenure,
-            "monthly_spend": monthly_spend
+            
         }
         
         # Send data to FastAPI for prediction

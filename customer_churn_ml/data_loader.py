@@ -9,6 +9,7 @@ def load_data():
 
     query = "SELECT * FROM customer;"
     result, column_names = execute_query(query=query)
+    
    
 
     if result and column_names:
