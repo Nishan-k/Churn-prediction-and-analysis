@@ -129,8 +129,9 @@ st.sidebar.markdown("**🔍 Navigate through the sections to explore customer ch
 
 
 
-
-# Home Page
+################################
+### Landing Page:
+################################
 if page == "🏠 Home":
      
      st.title("Customer Churn Prediction Model")
@@ -170,8 +171,9 @@ if page == "🏠 Home":
 
     
 
-
-# Prediction Page
+################################
+### PREDICT PAGE:
+################################
 if page == "📊 Predict":
     st.title("Churn Prediction")
     st.write("")
@@ -198,6 +200,7 @@ if page == "📊 Predict":
         device_protection = st.selectbox("Has Device Protection?", ["Yes", "No", "No internet service"])
         tech_support = st.selectbox("Has Tech Support?", ["Yes", "No", "No internet service"])
         streaming_tv = st.selectbox("Has Streaming TV?", ["Yes", "No", "No internet service"])
+        streaming_movies = st.selectbox("Does Customer Stream Movies?", ["Yes", "No", "No internet service"])
         contract = st.radio("Contract Type:", ("One year", "Month-to-month", "Two year"))
         paperless_billing = st.radio("Has Paperless Billing?", ("Yes", "No"))
         payment_method = st.selectbox("Payment Method:", ["Mailed check", "Bank transfer (automatic)", "Electronic check", "Credit card (automatic)"])
@@ -209,14 +212,50 @@ if page == "📊 Predict":
     if st.button("Predict Churn"):
         # Prepare data for API request
         payload = {
-            
+            "gender" : gender,
+            "senior_citizen" : senior_citizen,
+            "partner" : partner,
+            "dependents" : dependents,
+            "tenure" : tenure,
+            "phone_service" : phone_service,
+            "multiple_lines" : multiple_lines,
+            "internet_service" : internet_service,
+            "online_security" : online_security,
+            "online_backup" : online_backup,
+            "device_protection" : device_protection,
+            "tech_support" : tech_support,
+            "streaming_tv" : streaming_tv,
+            "streaming_movies" : streaming_movies,
+            "contract" : contract,
+            "paperless_billing" : paperless_billing,
+            "payment_method" : payment_method,
+            "monthly_charges" : monthly_charges,
+            "total_charges" : total_charges
         }
         
-        # Send data to FastAPI for prediction
-        response = requests.post(FASTAPI_URL, json=payload)
+
+
+        print(payload)
+        print("------")
+
+        res = requests.post("http://127.0.0.1:8000/predict", json=payload)
+        st.write(res)
         
-        if response.status_code == 200:
-            prediction = response.json().get("prediction")
-            st.write(f"Churn Prediction: {prediction}")
-        else:
-            st.error("Error in prediction. Please try again.")
+        # Send data to FastAPI for prediction
+        # response = requests.post(FASTAPI_URL, json=payload)
+        
+        # if response.status_code == 200:
+        #     prediction = response.json().get("prediction")
+        #     st.write(f"Churn Prediction: {prediction}")
+        # else:
+        #     st.error("Error in prediction. Please try again.")
+
+
+
+
+
+################################
+### ABOUT PAGE:
+################################
+if page == "ℹ️ About":
+    st.header("Creator: Nishan Karki")
