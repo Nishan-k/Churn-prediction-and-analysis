@@ -6,6 +6,7 @@ from PIL import Image
 from customer_churn_ml.data_loader import churn_count
 import matplotlib.pyplot as plt
 import plotly.express as px
+import json
 import uuid 
 
 
@@ -211,7 +212,7 @@ if page == "📊 Predict":
         
     if st.button("Predict Churn"):
         # Prepare data for API request
-        payload = {
+        input_features = {
             "gender" : gender,
             "senior_citizen" : senior_citizen,
             "partner" : partner,
@@ -235,11 +236,10 @@ if page == "📊 Predict":
         
 
 
-        print(payload)
-        print("------")
+       
+        # res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
+        # st.write(res)
 
-        res = requests.post("http://127.0.0.1:8000/predict", json=payload)
-        st.write(res)
         
         # Send data to FastAPI for prediction
         # response = requests.post(FASTAPI_URL, json=payload)
