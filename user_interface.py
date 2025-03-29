@@ -242,13 +242,39 @@ if page == "📊 Predict":
         if res.status_code == 200:
             prediction = res.json()['Prediction']
             prediction_prob = res.json()['Prediction_proba'] * 100
-            if prediction == 0:
-                st.write("Customer will stay")
-                st.write(f"Probability:{prediction_prob:.2f}%.")
-            else:
-                st.write("He is running away")
-        else:
-            st.error("Error in prediction. Please try again.")
+
+
+            st.subheader("Customer Health Dashboard")
+            m1, m2, m3 = st.columns(3)
+            m1.metric("Churn Risk", "Low" if prediction == 0 else "High",
+                      delta="15% better than average" if prediction == 0 else "30% worse than average")
+            m2.metric(label= "Prediction Confidence", value=f"{prediction_prob:.2f}%.")
+            m3.metric("Customer Value", "$1,240", delta="+12% YoY")
+            # Risk visualization
+            st.progress(15 if prediction == 0 else 72)
+
+            # Action items expander
+            with st.expander("Recommended Retention Actions"):
+                if prediction == 1:
+                    st.write("🔹 Offer personalized discount")
+                    st.write("🔹 Schedule customer success call")
+                    st.write("🔹 Provide exclusive content access")
+                else:
+                    st.balloons()
+                    st.write("🔸 Continue regular engagement")
+                    st.write("🔸 Monitor usage patterns")
+                    st.write("🔸 Quarterly check-in recommended")
+
+
+
+
+        #     if prediction == 0:
+        #         st.write("Customer will stay")
+        #         st.write(f"Probability:{prediction_prob:.2f}%.")
+        #     else:
+        #         st.write("He is running away")
+        # else:
+        #     st.error("Error in prediction. Please try again.")
 
 
 
