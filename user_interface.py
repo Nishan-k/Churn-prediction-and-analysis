@@ -236,19 +236,19 @@ if page == "📊 Predict":
         
 
 
-       
-        # res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
-        # st.write(res)
-
         
         # Send data to FastAPI for prediction
-        # response = requests.post(FASTAPI_URL, json=payload)
-        
-        # if response.status_code == 200:
-        #     prediction = response.json().get("prediction")
-        #     st.write(f"Churn Prediction: {prediction}")
-        # else:
-        #     st.error("Error in prediction. Please try again.")
+        res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
+        if res.status_code == 200:
+            prediction = res.json()['Prediction']
+            prediction_prob = res.json()['Prediction_proba'] * 100
+            if prediction == 0:
+                st.write("Customer will stay")
+                st.write(f"Probability:{prediction_prob:.2f}%.")
+            else:
+                st.write("He is running away")
+        else:
+            st.error("Error in prediction. Please try again.")
 
 
 

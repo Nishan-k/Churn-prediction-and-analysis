@@ -45,7 +45,10 @@ def predict_churn(input_features:Input_features):
     try:
         input_data = pd.DataFrame([input_features.model_dump()])
         result = model.predict(input_data)
-        return {"Prediction": result}
+        pred_prob = model.predict_proba(input_data)
+        pred_prob = pred_prob[0][pred_prob.argmax()]
+        prediction = result.tolist()[0]
+        return {"Prediction": prediction, "Prediction_proba": pred_prob}
     except Exception as e:
         return {'error': str(e)}
 
