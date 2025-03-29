@@ -19,9 +19,9 @@ def load_data():
         return None
     
 
-def churn_count():
+def get_churn_distribution():
     """
-    Get the current count of the Churn:
+    Get the summary of customers:
     """
     query = "SELECT churn, COUNT(*) FROM customer GROUP BY churn;"
     result, column_names = execute_query(query=query)
@@ -29,5 +29,34 @@ def churn_count():
     if result and column_names:
         df = pd.DataFrame(result, columns=column_names)
         return df
+    else:
+        return None
+    
+
+
+def get_churn_count():
+    """
+    Get the total count of customer who will churn.
+    """
+    query = "SELECT COUNT(*) FROM customer WHERE churn = 'Yes';"
+    result, column_names = execute_query(query=query)
+
+    if result and column_names:
+        df = pd.DataFrame(result, columns=column_names)
+        return df.iloc[0, 0]
+    else:
+        return None
+
+
+def get_total_customer_counts():
+    """
+    Returns the total number of customers.
+    """
+    query = "SELECT COUNT(*) FROM customer;"
+    result, column_names = execute_query(query=query)
+
+    if result and column_names:
+        df = pd.DataFrame(result, columns=column_names)
+        return df.iloc[0, 0]
     else:
         return None

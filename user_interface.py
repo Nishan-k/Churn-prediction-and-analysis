@@ -3,7 +3,7 @@ import requests
 import json 
 import pandas as pd
 from PIL import Image
-from customer_churn_ml.data_loader import churn_count
+from customer_churn_ml.data_loader import get_churn_distribution, get_churn_count, get_total_customer_counts
 import matplotlib.pyplot as plt
 import plotly.express as px
 import json
@@ -12,7 +12,9 @@ import uuid
 
 st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
 
-
+total_churn_count = get_churn_count()
+total_customers = get_total_customer_counts()
+baseline_churn_rate = (total_churn_count / total_customers) * 100
 ##----------------------------------------------------------------------------------##
 ## CSS Codes:
 
@@ -118,7 +120,7 @@ def visualize_churn_data(churn_data, chart_key):
 
 
 def get_data():
-    churn_data = churn_count()
+    churn_data = get_churn_distribution()
     return churn_data
 
 
@@ -235,23 +237,34 @@ if page == "📊 Predict":
         }
         
 
-
+        
         
         # Send data to FastAPI for prediction
         res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
         if res.status_code == 200:
             prediction = res.json()['Prediction']
             prediction_prob = res.json()['Prediction_proba'] * 100
+            delta_precentage = abs(baseline_churn_rate  - prediction_prob)
 
 
+            st.write("")
             st.subheader("Customer Health Dashboard")
             m1, m2, m3 = st.columns(3)
-            m1.metric("Churn Risk", "Low" if prediction == 0 else "High",
-                      delta="15% better than average" if prediction == 0 else "30% worse than average")
+
+            # Delta percentage:
+            m1.metric("Churn Risk", 
+                      "🟢 Low" if prediction == 0 else "🔴 High",
+                      delta=f"{delta_precentage:.2f}% better than average" if prediction == 0 else f"{delta_precentage:.2f}% worse than average")
+            
+            # Prediction Probability:
             m2.metric(label= "Prediction Confidence", value=f"{prediction_prob:.2f}%.")
+
+            # Year-Over-Year:
             m3.metric("Customer Value", "$1,240", delta="+12% YoY")
+
             # Risk visualization
-            st.progress(15 if prediction == 0 else 72)
+            risk_level = 100 - prediction_prob if prediction == 0 else prediction_prob
+            st.progress(int(risk_level))
 
             # Action items expander
             with st.expander("Recommended Retention Actions"):
@@ -266,15 +279,6 @@ if page == "📊 Predict":
                     st.write("🔸 Quarterly check-in recommended")
 
 
-
-
-        #     if prediction == 0:
-        #         st.write("Customer will stay")
-        #         st.write(f"Probability:{prediction_prob:.2f}%.")
-        #     else:
-        #         st.write("He is running away")
-        # else:
-        #     st.error("Error in prediction. Please try again.")
 
 
 
