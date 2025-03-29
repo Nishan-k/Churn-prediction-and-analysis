@@ -15,6 +15,12 @@ st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
 total_churn_count = get_churn_count()
 total_customers = get_total_customer_counts()
 baseline_churn_rate = (total_churn_count / total_customers) * 100
+
+contract_mapping = {
+    "Month-to-month": 6,
+    "One year": 12,
+    "Two year": 24
+}
 ##----------------------------------------------------------------------------------##
 ## CSS Codes:
 
@@ -257,13 +263,18 @@ if page == "📊 Predict":
                       delta=f"{delta_precentage:.2f}% better than average" if prediction == 0 else f"{delta_precentage:.2f}% worse than average")
             
             # Prediction Probability:
-            m2.metric(label= "Prediction Confidence", value=f"{prediction_prob:.2f}%.")
+            m2.metric(label= "Prediction Confidence", value=f"{prediction_prob:.2f}%", delta="Model's confidence")
 
-            # Year-Over-Year:
-            m3.metric("Customer Value", "$1,240", delta="+12% YoY")
+            # Customer Life-Time Value:
+            contract_length = contract_mapping.get(contract)
+            expected_remaining_tenure = max(contract_length - tenure, 0)
+            ltv = monthly_charges * expected_remaining_tenure
+
+            m3.metric("Customer Life Time Value", f"{ltv:.2f} €", delta="Expected Amount")
 
             # Risk visualization
             risk_level = 100 - prediction_prob if prediction == 0 else prediction_prob
+            st.write("Risk Level")
             st.progress(int(risk_level))
 
             # Action items expander
