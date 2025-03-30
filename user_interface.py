@@ -6,6 +6,7 @@ from PIL import Image
 from customer_churn_ml.data_loader import get_churn_distribution, get_churn_count, get_total_customer_counts
 import matplotlib.pyplot as plt
 import plotly.express as px
+from explainable import global_shap_summary
 import json
 import uuid 
 
@@ -300,3 +301,13 @@ if page == "📊 Predict":
 ################################
 if page == "ℹ️ About":
     st.header("Creator: Nishan Karki")
+
+
+
+
+if page == "📖 Explain":
+    st.write("SHAP")
+    global_shap_summary(
+    model_path="customer_churn_ml/churn_clf_model.pkl",
+    X_train_path="customer_churn_ml/Trained_Data.csv",
+    sample_size=100)
