@@ -1,2 +1,3 @@
 churn_venv/
 credentials.py
+customer_churn_ml/Trained_Data.csv
