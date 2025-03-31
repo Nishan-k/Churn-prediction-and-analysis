@@ -1,5 +1,7 @@
 import psycopg2
 from psycopg2 import sql
+import streamlit as st
+
 from customer_churn_ml.credentials import db_config
 
 
