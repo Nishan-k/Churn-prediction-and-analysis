@@ -10,8 +10,9 @@ import json
 import uuid 
 
 
-st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
 
+
+st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
 total_churn_count = get_churn_count()
 total_customers = get_total_customer_counts()
 baseline_churn_rate = (total_churn_count / total_customers) * 100
@@ -118,6 +119,7 @@ st.markdown(
 
 image = "./images/churn.jpg"
 
+
 def visualize_churn_data(churn_data, chart_key):
     custom_colors = {'Yes': '#fc4903', 'No': '#03fc94'} 
     st.subheader("Current Customer Distribution")
@@ -135,6 +137,8 @@ def get_data():
 
 page = st.sidebar.selectbox("Navigation Menu", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "ℹ️ About"])
 st.sidebar.markdown("**🔍 Navigate through the sections to explore customer churn insights!**")
+st.sidebar.markdown("")
+
 
 
 
