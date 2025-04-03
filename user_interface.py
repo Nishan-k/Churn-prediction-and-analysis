@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import json
 import uuid 
+from customer_churn_ml.shap import create_clean_shap_dashboard
 
 
 
@@ -259,6 +260,7 @@ if page == "📊 Predict":
 
             st.write("")
             st.subheader("Customer Health Dashboard")
+            
             m1, m2, m3 = st.columns(3)
 
             # Delta percentage:
@@ -281,17 +283,40 @@ if page == "📊 Predict":
             st.write("Risk Level")
             st.progress(int(risk_level))
 
+            st.write("")
+            st.write("SHAP")
+            
+            customer_data = pd.DataFrame.from_dict({k: [v] for k, v in input_features.items()})
+            result = create_clean_shap_dashboard(customer_data=customer_data)
+
+            st.subheader("Prediction Result")
+            prediction = result["prediction"]
+            probability = result["churn_probability"] * 100
+    
+            # Display prediction with formatting
+            if prediction == "Churn":
+                st.error(f"Customer is predicted to churn with {probability:.1f}% probability")
+            else:
+                st.success(f"Customer is predicted to stay with {(100-probability):.1f}% probability")
+            
+            # Display the plot
+            st.subheader("Feature Impact Analysis")
+            st.pyplot(result["plot"])
+            
+            # Optional: Display feature explanations in text form
+            
+
             # Action items expander
-            with st.expander("Recommended Retention Actions"):
-                if prediction == 1:
-                    st.write("🔹 Offer personalized discount")
-                    st.write("🔹 Schedule customer success call")
-                    st.write("🔹 Provide exclusive content access")
-                else:
-                    st.balloons()
-                    st.write("🔸 Continue regular engagement")
-                    st.write("🔸 Monitor usage patterns")
-                    st.write("🔸 Quarterly check-in recommended")
+            # with st.expander("Recommended Retention Actions"):
+            #     if prediction == 1:
+            #         st.write("🔹 Offer personalized discount")
+            #         st.write("🔹 Schedule customer success call")
+            #         st.write("🔹 Provide exclusive content access")
+            #     else:
+            #         st.balloons()
+            #         st.write("🔸 Continue regular engagement")
+            #         st.write("🔸 Monitor usage patterns")
+            #         st.write("🔸 Quarterly check-in recommended")
 
 
 
