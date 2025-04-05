@@ -243,8 +243,8 @@ if page == "📊 Predict":
             "contract" : contract,
             "paperless_billing" : paperless_billing,
             "payment_method" : payment_method,
-            "monthly_charges" : monthly_charges,
-            "total_charges" : total_charges
+            "monthly_charges" : round(monthly_charges, 2),
+            "total_charges" : round(total_charges, 2)
         }
         
 
@@ -284,7 +284,7 @@ if page == "📊 Predict":
             st.progress(int(risk_level))
 
             st.write("")
-            st.write("SHAP")
+            
             
             customer_data = pd.DataFrame.from_dict({k: [v] for k, v in input_features.items()})
             result = create_clean_shap_dashboard(customer_data=customer_data)
