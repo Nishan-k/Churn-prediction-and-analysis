@@ -9,7 +9,7 @@ import plotly.express as px
 import json
 import uuid 
 from customer_churn_ml.shap import create_clean_shap_dashboard
-
+from customer_health import customer_health_dashboard
 
 
 
@@ -25,7 +25,7 @@ if 'shap_values' not in st.session_state:
 if 'prediction_result' not in st.session_state:
     st.session_state.prediction_result = None
 if 'show_dashboard' not in st.session_state:
-    st.session_state.show_dashboard = None
+    st.session_state.show_dashboard = False
 
 total_churn_count = get_churn_count()
 total_customers = get_total_customer_counts()
@@ -267,63 +267,68 @@ if page == "📊 Predict":
         # Send data to FastAPI for prediction
         res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
         if res.status_code == 200:
-            prediction = res.json()['Prediction']
-            st.session_state.prediction_result = prediction
-            prediction_prob = res.json()['Prediction_proba'] * 100
-            delta_precentage = abs(baseline_churn_rate  - prediction_prob)
+            st.session_state.show_dashboard = True
+            customer_health_dashboard(res, input_features=input_features)
+            st.session_state.show_dashboard = True
+        
+        
+            # prediction = res.json()['Prediction']
+            # st.session_state.prediction_result = prediction
+            # prediction_prob = res.json()['Prediction_proba'] * 100
+            # delta_precentage = abs(baseline_churn_rate  - prediction_prob)
 
 
-            st.write("")
-            st.subheader("Customer Health Dashboard")
+            # st.write("")
+            # st.subheader("Customer Health Dashboard")
             
-            m1, m2, m3 = st.columns(3)
+            # m1, m2, m3 = st.columns(3)
 
-            # Delta percentage:
-            m1.metric("Churn Risk", 
-                      "🟢 Low" if prediction == 0 else "🔴 High",
-                      delta=f"{delta_precentage:.2f}% better than average" if prediction == 0 else f"{delta_precentage:.2f}% worse than average")
+            # # Delta percentage:
+            # m1.metric("Churn Risk", 
+            #           "🟢 Low" if prediction == 0 else "🔴 High",
+            #           delta=f"{delta_precentage:.2f}% better than average" if prediction == 0 else f"{delta_precentage:.2f}% worse than average")
             
-            # Prediction Probability:
-            m2.metric(label= "Prediction Confidence", value=f"{prediction_prob:.2f}%", delta="Model's confidence")
+            # # Prediction Probability:
+            # m2.metric(label= "Prediction Confidence", value=f"{prediction_prob:.2f}%", delta="Model's confidence")
 
-            # Customer Life-Time Value:
-            contract_length = contract_mapping.get(contract)
-            expected_remaining_tenure = max(contract_length - tenure, 0)
-            ltv = monthly_charges * expected_remaining_tenure
+            # # Customer Life-Time Value:
+            # contract_length = contract_mapping.get(contract)
+            # expected_remaining_tenure = max(contract_length - tenure, 0)
+            # ltv = monthly_charges * expected_remaining_tenure
 
-            m3.metric("Customer Life Time Value", f"{ltv:.2f} €", delta="Expected Amount")
+            # m3.metric("Customer Life Time Value", f"{ltv:.2f} €", delta="Expected Amount")
 
-            # Risk visualization
-            risk_level = 100 - prediction_prob if prediction == 0 else prediction_prob
-            st.write("Risk Level")
-            st.progress(int(risk_level))
+            # # Risk visualization
+            # risk_level = 100 - prediction_prob if prediction == 0 else prediction_prob
+            # st.write("Risk Level")
+            # st.progress(int(risk_level))
 
-            st.write("")
+            # st.write("")
             
             
-            customer_data = pd.DataFrame.from_dict({k: [v] for k, v in input_features.items()})
-            result = create_clean_shap_dashboard(customer_data=customer_data)
-            shap_values = result["shap_values"]
-            st.session_state.customer_data = customer_data
-            st.session_state.shap_values = shap_values
+            # customer_data = pd.DataFrame.from_dict({k: [v] for k, v in input_features.items()})
+            # result = create_clean_shap_dashboard(customer_data=customer_data)
+            # shap_values = result["shap_values"]
+            # st.session_state.customer_data = customer_data
+            # st.session_state.shap_values = shap_values
 
-            st.subheader("Prediction Result")
-            prediction = result["prediction"]
-            probability = result["churn_probability"] * 100
+            # st.subheader("Prediction Result")
+            # prediction = result["prediction"]
+            # probability = result["churn_probability"] * 100
     
-            # Display prediction with formatting
-            if prediction == "Churn":
-                st.error(f"Customer is predicted to churn with {probability:.1f}% probability")
-            else:
-                st.success(f"Customer is predicted to stay with {(100-probability):.1f}% probability")
+            # # Display prediction with formatting
+            # if prediction == "Churn":
+            #     st.error(f"Customer is predicted to churn with {probability:.1f}% probability")
+            # else:
+            #     st.success(f"Customer is predicted to stay with {(100-probability):.1f}% probability")
             
-            # Display the plot
-            st.subheader("Feature Impact Analysis")
-            st.pyplot(result["plot"])
-            st.write("")
-            st.write("")
-            st.info("👉Now, you can go to '📖 Explain' page or '💡 Recommendations' or 📑 Generate Report page for further actions for this customer in the Navigation bar.")
-            st.write("")
+            # # Display the plot
+            # st.subheader("Feature Impact Analysis")
+            # st.pyplot(result["plot"])
+            # st.write("")
+            # st.write("")
+            # st.info("👉Now, you can go to '📖 Explain' page or '💡 Recommendations' or 📑 Generate Report page for further actions for this customer in the Navigation bar.")
+            # st.write("")
 
 
                 
