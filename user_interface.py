@@ -24,6 +24,8 @@ if 'shap_values' not in st.session_state:
     st.session_state.shap_values = None
 if 'prediction_result' not in st.session_state:
     st.session_state.prediction_result = None
+if 'show_dashboard' not in st.session_state:
+    st.session_state.show_dashboard = None
 
 total_churn_count = get_churn_count()
 total_customers = get_total_customer_counts()
