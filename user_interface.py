@@ -319,22 +319,24 @@ if page == "📊 Predict":
             st.subheader("Feature Impact Analysis")
             st.pyplot(result["plot"])
             st.write("")
+            st.write("")
+            st.info("👉Now, you can go to '📖 Explain' page in the sidebar to see detailed explanations or '💡 Recommendations' page for suggested actions for this customer.")
 
-            button_clicked = 0
-            col1, col2 = st.columns(2)
-            with col1:
-                if st.button("View Detailed Explanation"):
-                    st.session_state.page_selection = "📖 Explain" 
-                    button_clicked += 1                   
-                    st.rerun()  
+            # button_clicked = 0
+            # col1, col2 = st.columns(2)
+            # with col1:
+            #     if st.button("View Detailed Explanation"):
+            #         st.session_state.page_selection = "📖 Explain" 
+            #         button_clicked += 1                   
+            #         st.rerun()  
 
-            with col2:  
-                if st.button("View Recommendations"):
-                    st.session_state.page_selection = "💡 Recommendations"
-                    st.rerun()  
+            # with col2:  
+            #     if st.button("View Recommendations"):
+            #         st.session_state.page_selection = "💡 Recommendations"
+            #         st.rerun()  
 
             
-            st.info("👉 After clicking one of these buttons, you can go to '📖 Explain' page in the sidebar to see detailed explanations or '💡 Recommendations' page for suggested actions.")
+            
 
 
 if page == "📖 Explain":
@@ -349,7 +351,7 @@ if page == "📖 Explain":
         
 
 if page == "💡 Recommendations":
-    st.write("Hello there")
+     st.dataframe(st.session_state.customer_data)
 
 
 
