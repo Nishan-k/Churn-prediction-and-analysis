@@ -321,6 +321,11 @@ if page == "📊 Predict":
             st.write("")
             st.write("")
             st.info("👉Now, you can go to '📖 Explain' page in the sidebar to see detailed explanations or '💡 Recommendations' page for suggested actions for this customer.")
+            st.write("")
+
+        with st.form("report_form"):
+            if st.form_submit_button("Generate Report"):
+                st.write("OpenAI goes here")
 
             # button_clicked = 0
             # col1, col2 = st.columns(2)
