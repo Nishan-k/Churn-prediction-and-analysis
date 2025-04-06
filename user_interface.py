@@ -26,6 +26,8 @@ if 'prediction_result' not in st.session_state:
     st.session_state.prediction_result = None
 if 'show_dashboard' not in st.session_state:
     st.session_state.show_dashboard = False
+if 'dashboard_data' not in st.session_state:
+    st.session_state.dashboard_data = None
 
 total_churn_count = get_churn_count()
 total_customers = get_total_customer_counts()
@@ -267,11 +269,10 @@ if page == "📊 Predict":
         # Send data to FastAPI for prediction
         res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
         if res.status_code == 200:
-            st.session_state.show_dashboard = True
             customer_health_dashboard(res, input_features=input_features)
-            st.session_state.show_dashboard = True
-        
-        
+            
+            
+            
             # prediction = res.json()['Prediction']
             # st.session_state.prediction_result = prediction
             # prediction_prob = res.json()['Prediction_proba'] * 100

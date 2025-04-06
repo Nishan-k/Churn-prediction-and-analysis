@@ -14,6 +14,8 @@ contract_mapping = {
 }
 
 def customer_health_dashboard(res, input_features):
+    st.session_state.res = res
+    st.session_state.input_features = input_features
     prediction = res.json()['Prediction']
     st.session_state.prediction_result = prediction
     prediction_prob = res.json()['Prediction_proba'] * 100
