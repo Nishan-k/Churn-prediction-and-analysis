@@ -9,7 +9,7 @@ import plotly.express as px
 import json
 import uuid 
 from customer_churn_ml.shap import create_clean_shap_dashboard
-from customer_health import customer_health_dashboard
+from customer_health import customer_health_dashboard, display_dashboard
 
 
 
@@ -28,6 +28,12 @@ if 'show_dashboard' not in st.session_state:
     st.session_state.show_dashboard = False
 if 'dashboard_data' not in st.session_state:
     st.session_state.dashboard_data = None
+if 'prediction_data' not in st.session_state:
+    st.session_state.prediction_data = None
+if 'input_features' not in st.session_state:
+    st.session_state.input_features = None
+if 'shap_plot' not in st.session_state:
+    st.session_state.shap_plot = None
 
 total_churn_count = get_churn_count()
 total_customers = get_total_customer_counts()
@@ -207,71 +213,87 @@ if page == "🏠 Home":
 if page == "📊 Predict":
     st.title("Churn Prediction")
     st.write("")
-    st.subheader("Select Features Or Enter Data to Predict:")
-    st.write("")
+    if st.session_state.get('dashboard_displayed', False):
+                display_dashboard()
 
-    # User input fields
-    col1, col2 = st.columns([6, 6])
+                if st.button("Make New Prediction"):
+                    st.session_state.dashboard_displayed = False
+                    st.rerun()
 
-    with col1:
-        gender = st.radio("Gender:", ("Male", "Female"))
-        senior_citizen = st.radio("Is Senior Citizen?", ["Yes", "No"])
-        partner = st.radio("Does the customer have a partner (e.g., spouse or significant other)?",["Yes", "No"])
-        dependents = st.radio("Does the customer have dependents (e.g., children, spouse, or family members relying on you)?", ["Yes", "No"])
-        tenure = st.number_input("Tenure (In Months):", min_value=1, max_value=100, step=1)
-        phone_service = st.radio("Has Phone Service?", ["Yes", "No"])
-        multiple_lines = st.radio("Has Multiple Lines?", ["Yes", "No"])
-        internet_service = st.selectbox("Internet Service:", ["DSL", "Fibre optic", "No"])
-        online_security = st.selectbox("Has intenet security?", ["Yes", "No","No internet service"])
+    if not st.session_state.get('dashboard_displayed', False):
+        st.subheader("Select Features Or Enter Data to Predict:")
+        st.write("")
+
+        # User input fields
+        col1, col2 = st.columns([6, 6])
+
+        with col1:
+            gender = st.radio("Gender:", ("Male", "Female"))
+            senior_citizen = st.radio("Is Senior Citizen?", ["Yes", "No"])
+            partner = st.radio("Does the customer have a partner (e.g., spouse or significant other)?",["Yes", "No"])
+            dependents = st.radio("Does the customer have dependents (e.g., children, spouse, or family members relying on you)?", ["Yes", "No"])
+            tenure = st.number_input("Tenure (In Months):", min_value=1, max_value=100, step=1)
+            phone_service = st.radio("Has Phone Service?", ["Yes", "No"])
+            multiple_lines = st.radio("Has Multiple Lines?", ["Yes", "No"])
+            internet_service = st.selectbox("Internet Service:", ["DSL", "Fibre optic", "No"])
+            online_security = st.selectbox("Has intenet security?", ["Yes", "No","No internet service"])
+            
+        
+        with col2:
+            online_backup = st.selectbox("Has online backup?", ["Yes", "No", "No internet service"])
+            device_protection = st.selectbox("Has Device Protection?", ["Yes", "No", "No internet service"])
+            tech_support = st.selectbox("Has Tech Support?", ["Yes", "No", "No internet service"])
+            streaming_tv = st.selectbox("Has Streaming TV?", ["Yes", "No", "No internet service"])
+            streaming_movies = st.selectbox("Does Customer Stream Movies?", ["Yes", "No", "No internet service"])
+            contract = st.radio("Contract Type:", ("One year", "Month-to-month", "Two year"))
+            paperless_billing = st.radio("Has Paperless Billing?", ("Yes", "No"))
+            payment_method = st.selectbox("Payment Method:", ["Mailed check", "Bank transfer (automatic)", "Electronic check", "Credit card (automatic)"])
+            monthly_charges = st.number_input("Monthly Charge:", min_value=18.95, max_value=130.0, step=0.1)
+            total_charges = st.number_input("Total Charge:", min_value=35.0, max_value=7900.0, step=0.1)
+
+
+            
+        if st.button("Predict Churn"):
+            # Prepare data for API request
+            input_features = {
+                "gender" : gender,
+                "senior_citizen" : senior_citizen,
+                "partner" : partner,
+                "dependents" : dependents,
+                "tenure" : tenure,
+                "phone_service" : phone_service,
+                "multiple_lines" : multiple_lines,
+                "internet_service" : internet_service,
+                "online_security" : online_security,
+                "online_backup" : online_backup,
+                "device_protection" : device_protection,
+                "tech_support" : tech_support,
+                "streaming_tv" : streaming_tv,
+                "streaming_movies" : streaming_movies,
+                "contract" : contract,
+                "paperless_billing" : paperless_billing,
+                "payment_method" : payment_method,
+                "monthly_charges" : round(monthly_charges, 2),
+                "total_charges" : round(total_charges, 2)
+            }
         
     
-    with col2:
-        online_backup = st.selectbox("Has online backup?", ["Yes", "No", "No internet service"])
-        device_protection = st.selectbox("Has Device Protection?", ["Yes", "No", "No internet service"])
-        tech_support = st.selectbox("Has Tech Support?", ["Yes", "No", "No internet service"])
-        streaming_tv = st.selectbox("Has Streaming TV?", ["Yes", "No", "No internet service"])
-        streaming_movies = st.selectbox("Does Customer Stream Movies?", ["Yes", "No", "No internet service"])
-        contract = st.radio("Contract Type:", ("One year", "Month-to-month", "Two year"))
-        paperless_billing = st.radio("Has Paperless Billing?", ("Yes", "No"))
-        payment_method = st.selectbox("Payment Method:", ["Mailed check", "Bank transfer (automatic)", "Electronic check", "Credit card (automatic)"])
-        monthly_charges = st.number_input("Monthly Charge:", min_value=18.95, max_value=130.0, step=0.1)
-        total_charges = st.number_input("Total Charge:", min_value=35.0, max_value=7900.0, step=0.1)
-
-
-        
-    if st.button("Predict Churn"):
-        # Prepare data for API request
-        input_features = {
-            "gender" : gender,
-            "senior_citizen" : senior_citizen,
-            "partner" : partner,
-            "dependents" : dependents,
-            "tenure" : tenure,
-            "phone_service" : phone_service,
-            "multiple_lines" : multiple_lines,
-            "internet_service" : internet_service,
-            "online_security" : online_security,
-            "online_backup" : online_backup,
-            "device_protection" : device_protection,
-            "tech_support" : tech_support,
-            "streaming_tv" : streaming_tv,
-            "streaming_movies" : streaming_movies,
-            "contract" : contract,
-            "paperless_billing" : paperless_billing,
-            "payment_method" : payment_method,
-            "monthly_charges" : round(monthly_charges, 2),
-            "total_charges" : round(total_charges, 2)
-        }
-        
-
         
         
-        # Send data to FastAPI for prediction
-        res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
-        if res.status_code == 200:
-            customer_health_dashboard(res, input_features=input_features)
+            # Send data to FastAPI for prediction
+            res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
+            if res.status_code == 200:
+                customer_health_dashboard(res, input_features=input_features)
             
-            
+            # Persistent display (works after page navigation)
+            # if st.session_state.show_dashboard:
+            #     show_customer_dashboard()  # Session state version
+                
+            #     if st.button("Clear Dashboard"):
+            #         st.session_state.show_dashboard = False
+            #         st.session_state.shap_plot = None
+            #         st.rerun()
+                
             
             # prediction = res.json()['Prediction']
             # st.session_state.prediction_result = prediction
