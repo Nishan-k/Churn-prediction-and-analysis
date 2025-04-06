@@ -14,6 +14,17 @@ from customer_churn_ml.shap import create_clean_shap_dashboard
 
 
 st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
+
+
+
+# Initializing the sessions in Streamlit:
+if 'customer_data' not in st.session_state:
+    st.session_state.customer_data = None
+if 'prediction' not in st.session_state:
+    st.session_state.prediction = None
+if 'shap_values' not in st.session_state:
+    st.session_state.shap_values = None
+
 total_churn_count = get_churn_count()
 total_customers = get_total_customer_counts()
 baseline_churn_rate = (total_churn_count / total_customers) * 100
@@ -133,10 +144,11 @@ def get_data():
     return churn_data
 
 
+if "page_selection" not in st.session_state:
+    st.session_state.page_selection = "🏠 Home"
 
-
-
-page = st.sidebar.selectbox("Navigation Menu", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "ℹ️ About"])
+page = st.sidebar.selectbox("Navigation Menu", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "ℹ️ About"],
+                            key="page_selection")
 st.sidebar.markdown("**🔍 Navigate through the sections to explore customer churn insights!**")
 st.sidebar.markdown("")
 
@@ -254,6 +266,7 @@ if page == "📊 Predict":
         res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
         if res.status_code == 200:
             prediction = res.json()['Prediction']
+            st.session_state.prediction_result = prediction
             prediction_prob = res.json()['Prediction_proba'] * 100
             delta_precentage = abs(baseline_churn_rate  - prediction_prob)
 
@@ -288,6 +301,9 @@ if page == "📊 Predict":
             
             customer_data = pd.DataFrame.from_dict({k: [v] for k, v in input_features.items()})
             result = create_clean_shap_dashboard(customer_data=customer_data)
+            shap_values = result["shap_values"]
+            st.session_state.customer_data = customer_data
+            st.session_state.shap_values = shap_values
 
             st.subheader("Prediction Result")
             prediction = result["prediction"]
@@ -302,25 +318,38 @@ if page == "📊 Predict":
             # Display the plot
             st.subheader("Feature Impact Analysis")
             st.pyplot(result["plot"])
+            st.write("")
+
+            button_clicked = 0
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("View Detailed Explanation"):
+                    st.session_state.page_selection = "📖 Explain" 
+                    button_clicked += 1                   
+                    st.rerun()  
+
+            with col2:  
+                if st.button("View Recommendations"):
+                    st.session_state.page_selection = "💡 Recommendations"
+                    st.rerun()  
+
             
-            # Optional: Display feature explanations in text form
-            
-
-            # Action items expander
-            # with st.expander("Recommended Retention Actions"):
-            #     if prediction == 1:
-            #         st.write("🔹 Offer personalized discount")
-            #         st.write("🔹 Schedule customer success call")
-            #         st.write("🔹 Provide exclusive content access")
-            #     else:
-            #         st.balloons()
-            #         st.write("🔸 Continue regular engagement")
-            #         st.write("🔸 Monitor usage patterns")
-            #         st.write("🔸 Quarterly check-in recommended")
+            st.info("👉 After clicking one of these buttons, you can go to '📖 Explain' page in the sidebar to see detailed explanations or '💡 Recommendations' page for suggested actions.")
 
 
+if page == "📖 Explain":
+    st.title("Churn Explanation")
+    if st.session_state.customer_data is None:
+        st.warning("Please make a prediction first!")
+        if st.button("Go to Prediction Page"):
+            st.session_state.page_selection = "📊 Predict" 
+            st.rerun()
+    else:
+        st.dataframe(st.session_state.customer_data)
+        
 
-
+if page == "💡 Recommendations":
+    st.write("Hello there")
 
 
 
@@ -333,6 +362,4 @@ if page == "ℹ️ About":
 
 
 
-if page == "📖 Explain":
-    st.write("SHAP")
-    st.subheader("Model Explanation")
+

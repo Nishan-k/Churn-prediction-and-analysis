@@ -209,7 +209,8 @@ def create_clean_shap_dashboard(customer_data, model=model, background_data=None
         "churn_probability": float(prediction_proba),
         "plot": fig,
         # "feature_impacts": feature_impacts,
-        "base_value": float(base_value)
+        "base_value": float(base_value),
+        "shap_values": shap_values
     }
 
 
