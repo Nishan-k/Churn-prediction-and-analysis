@@ -20,10 +20,10 @@ st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
 # Initializing the sessions in Streamlit:
 if 'customer_data' not in st.session_state:
     st.session_state.customer_data = None
-if 'prediction' not in st.session_state:
-    st.session_state.prediction = None
 if 'shap_values' not in st.session_state:
     st.session_state.shap_values = None
+if 'prediction_result' not in st.session_state:
+    st.session_state.prediction_result = None
 
 total_churn_count = get_churn_count()
 total_customers = get_total_customer_counts()
@@ -147,7 +147,7 @@ def get_data():
 if "page_selection" not in st.session_state:
     st.session_state.page_selection = "🏠 Home"
 
-page = st.sidebar.selectbox("Navigation Menu", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "ℹ️ About"],
+page = st.sidebar.selectbox("Navigation Menu", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "📑 Generate Report", "ℹ️ About"],
                             key="page_selection")
 st.sidebar.markdown("**🔍 Navigate through the sections to explore customer churn insights!**")
 st.sidebar.markdown("")
@@ -320,27 +320,17 @@ if page == "📊 Predict":
             st.pyplot(result["plot"])
             st.write("")
             st.write("")
-            st.info("👉Now, you can go to '📖 Explain' page in the sidebar to see detailed explanations or '💡 Recommendations' page for suggested actions for this customer.")
+            st.info("👉Now, you can go to '📖 Explain' page or '💡 Recommendations' or 📑 Generate Report page for further actions for this customer in the Navigation bar.")
             st.write("")
 
-        with st.form("report_form"):
-            if st.form_submit_button("Generate Report"):
-                st.write("OpenAI goes here")
 
-            # button_clicked = 0
-            # col1, col2 = st.columns(2)
-            # with col1:
-            #     if st.button("View Detailed Explanation"):
-            #         st.session_state.page_selection = "📖 Explain" 
-            #         button_clicked += 1                   
-            #         st.rerun()  
+                
 
-            # with col2:  
-            #     if st.button("View Recommendations"):
-            #         st.session_state.page_selection = "💡 Recommendations"
-            #         st.rerun()  
 
-            
+
+        
+   
+
             
 
 
@@ -359,6 +349,10 @@ if page == "💡 Recommendations":
      st.dataframe(st.session_state.customer_data)
 
 
+if page == "📑 Generate Report":
+    st.write(st.session_state.shap_values)
+    st.write("")
+    st.write(st.session_state.prediction_result)
 
 ################################
 ### ABOUT PAGE:
