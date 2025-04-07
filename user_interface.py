@@ -318,7 +318,7 @@ if page == "📑 Generate Report":
         if st.button("Go to Prediction Page", on_click=navigate_to_predict):
              pass  
     else:
-        st.write(st.session_state.shap_values)
+        st.write(st.session_state.shap_values[0].values)
         st.write("")
         st.write(st.session_state.prediction_result)
 
