@@ -323,8 +323,8 @@ if page == "📑 Generate Report":
         result = aggregated_shap_features(customer_data=st.session_state.customer_data)
         st.write(result)
         # st.write(st.session_state.shap_result)
-        # st.write("")
-        # st.write(st.session_state.prediction_result)
+        st.write("")
+        st.write(st.session_state.prediction_result)
 
 ################################
 ### ABOUT PAGE:
