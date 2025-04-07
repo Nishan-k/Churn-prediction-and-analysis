@@ -16,6 +16,9 @@ from customer_health import customer_health_dashboard, display_dashboard
 st.set_page_config(page_title="Customer Churn Prediction", layout="centered")
 
 
+def navigate_to_predict():
+    st.session_state.page_selection = "📊 Predict"
+
 
 # Initializing the sessions in Streamlit:
 if 'customer_data' not in st.session_state:
@@ -292,9 +295,8 @@ if page == "📖 Explain":
     st.title("Churn Explanation")
     if st.session_state.customer_data is None:
         st.warning("Please make a prediction first!")
-        if st.button("Go to Prediction Page"):
-            st.session_state.page_selection = "📊 Predict" 
-            st.rerun()
+        if st.button("Go to Prediction Page", on_click=navigate_to_predict):
+             pass  
     else:
         st.dataframe(st.session_state.customer_data)
         
@@ -303,9 +305,8 @@ if page == "💡 Recommendations":
      st.title("Recommendations")
      if st.session_state.customer_data is None:
         st.warning("Please make a prediction first!")
-        if st.button("Go to Prediction Page"):
-            st.session_state.page_selection = "📊 Predict" 
-            st.rerun()
+        if st.button("Go to Prediction Page", on_click=navigate_to_predict):
+             pass  
      else:
         st.dataframe(st.session_state.customer_data)
 
@@ -314,9 +315,8 @@ if page == "📑 Generate Report":
     st.title("Generate a report for the stakeholder using LLMs")
     if st.session_state.customer_data is None:
         st.warning("Please make a prediction first!")
-        if st.button("Go to Prediction Page"):
-            st.session_state.page_selection = "📊 Predict" 
-            st.rerun()
+        if st.button("Go to Prediction Page", on_click=navigate_to_predict):
+             pass  
     else:
         st.write(st.session_state.shap_values)
         st.write("")
