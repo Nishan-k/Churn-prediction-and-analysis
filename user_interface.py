@@ -8,8 +8,10 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import json
 import uuid 
-from customer_churn_ml.shap import create_clean_shap_dashboard
+from customer_churn_ml.shap import create_clean_shap_dashboard, aggregated_shap_features
 from customer_health import customer_health_dashboard, display_dashboard
+import joblib
+
 
 
 
@@ -318,9 +320,11 @@ if page == "📑 Generate Report":
         if st.button("Go to Prediction Page", on_click=navigate_to_predict):
              pass  
     else:
-        st.write(st.session_state.shap_values[0].values)
-        st.write("")
-        st.write(st.session_state.prediction_result)
+        result = aggregated_shap_features(customer_data=st.session_state.customer_data)
+        st.write(result)
+        # st.write(st.session_state.shap_result)
+        # st.write("")
+        # st.write(st.session_state.prediction_result)
 
 ################################
 ### ABOUT PAGE:
