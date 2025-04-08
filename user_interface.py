@@ -11,7 +11,7 @@ import uuid
 from customer_churn_ml.shap import create_clean_shap_dashboard, aggregated_shap_features
 from customer_health import customer_health_dashboard, display_dashboard
 import joblib
-
+from ui_components.generate_report import get_report
 
 
 
@@ -220,9 +220,10 @@ if page == "📊 Predict":
     st.write("")
     if st.session_state.get('dashboard_displayed', False):
                 display_dashboard()
-
                 if st.button("Make New Prediction"):
                     st.session_state.dashboard_displayed = False
+                    # st.session_state.customer_data = None
+                    # st.session_state.prediction_result = None
                     st.rerun()
 
     if not st.session_state.get('dashboard_displayed', False):
@@ -289,7 +290,7 @@ if page == "📊 Predict":
             res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
             if res.status_code == 200:
                 customer_health_dashboard(res, input_features=input_features)
-                     
+            
 
 
 
@@ -320,11 +321,10 @@ if page == "📑 Generate Report":
         if st.button("Go to Prediction Page", on_click=navigate_to_predict):
              pass  
     else:
-        result = aggregated_shap_features(customer_data=st.session_state.customer_data)
-        st.write(result)
-        # st.write(st.session_state.shap_result)
-        st.write("")
-        st.write(st.session_state.prediction_result)
+        shap_values = aggregated_shap_features(customer_data=st.session_state.customer_data)
+        prediction = st.session_state.prediction_result
+        report = get_report(shap_values=shap_values, predictions=prediction)
+        st.write(report)
 
 ################################
 ### ABOUT PAGE:
