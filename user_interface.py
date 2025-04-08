@@ -321,10 +321,15 @@ if page == "📑 Generate Report":
         if st.button("Go to Prediction Page", on_click=navigate_to_predict):
              pass  
     else:
-        shap_values = aggregated_shap_features(customer_data=st.session_state.customer_data)
         prediction = st.session_state.prediction_result
-        report = get_report(shap_values=shap_values, predictions=prediction)
-        st.write(report)
+        customer_data = st.session_state.customer_data
+        aggregated_features = aggregated_shap_features(customer_data=customer_data)
+        st.write("The Customer will stay" if prediction == 0 else "The customer will leave")
+        st.write("")
+        if st.button("Generate Report"):
+            report = get_report(shap_values=aggregated_features, predictions=prediction)
+            st.write(report)
+            
 
 ################################
 ### ABOUT PAGE:
