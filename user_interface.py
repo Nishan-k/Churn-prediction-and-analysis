@@ -162,7 +162,7 @@ def get_data():
 if "page_selection" not in st.session_state:
     st.session_state.page_selection = "🏠 Home"
 
-page = st.sidebar.selectbox("Navigation Menu", ["🏠 Home", "📊 Predict", "📖 Explain", "💡 Recommendations", "📑 Generate Report", "ℹ️ About"],
+page = st.sidebar.selectbox("Navigation Menu", ["🏠 Home", "📊 Predict", "📖 Explain", "📑 Generate Report", "ℹ️ About"],
                             key="page_selection")
 st.sidebar.markdown("**🔍 Navigate through the sections to explore customer churn insights!**")
 st.sidebar.markdown("")
@@ -305,14 +305,14 @@ if page == "📖 Explain":
         st.dataframe(st.session_state.customer_data)
         
 
-if page == "💡 Recommendations":
-     st.title("Recommendations")
-     if st.session_state.customer_data is None:
-        st.warning("Please make a prediction first!")
-        if st.button("Go to Prediction Page", on_click=navigate_to_predict):
-             pass  
-     else:
-        st.dataframe(st.session_state.customer_data)
+# if page == "💡 Recommendations":
+#      st.title("Recommendations")
+#      if st.session_state.customer_data is None:
+#         st.warning("Please make a prediction first!")
+#         if st.button("Go to Prediction Page", on_click=navigate_to_predict):
+#              pass  
+#      else:
+#         st.dataframe(st.session_state.customer_data)
 
 
 if page == "📑 Generate Report":
