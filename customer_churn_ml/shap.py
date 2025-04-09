@@ -24,6 +24,7 @@ def aggregated_shap_features(customer_data, model=model, background_data=None):
     preprocessor = model.named_steps['preprocessor']
     
     # Transform customer data
+    # customer_data = pd.DataFrame.from_dict(customer_data[0])
     X_transformed = preprocessor.transform(customer_data)
     if hasattr(X_transformed, "toarray"):
         X_transformed = X_transformed.toarray()

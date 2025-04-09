@@ -222,7 +222,7 @@ if page == "📊 Predict":
                 display_dashboard()
                 if st.button("Make New Prediction"):
                     st.session_state.dashboard_displayed = False
-                    # st.session_state.customer_data = None
+                    st.session_state.customer_data = None
                     # st.session_state.prediction_result = None
                     st.rerun()
 
@@ -282,6 +282,7 @@ if page == "📊 Predict":
                 "monthly_charges" : round(monthly_charges, 2),
                 "total_charges" : round(total_charges, 2)
             }
+            st.session_state.customer_data = input_features
         
     
         
@@ -322,10 +323,15 @@ if page == "📑 Generate Report":
              pass  
     else:
         prediction = st.session_state.prediction_result
-        customer_data = st.session_state.customer_data
-        aggregated_features = aggregated_shap_features(customer_data=customer_data)
+        data = st.session_state.customer_data
+        st.write(data)
+        customer_data_df = pd.DataFrame([data])
+        aggregated_features = aggregated_shap_features(customer_data=customer_data_df)
         st.write("The Customer will stay" if prediction == 0 else "The customer will leave")
         st.write("")
+        st.write(aggregated_features)
+        st.write("")
+        st.write(data)
         if st.button("Generate Report"):
             report = get_report(shap_values=aggregated_features, predictions=prediction)
             st.write(report)
