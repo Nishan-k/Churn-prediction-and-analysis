@@ -324,7 +324,6 @@ if page == "📑 Generate Report":
     else:
         prediction = st.session_state.prediction_result
         data = st.session_state.customer_data
-        st.write(data)
         customer_data_df = pd.DataFrame([data])
         aggregated_features = aggregated_shap_features(customer_data=customer_data_df)
         st.write("The Customer will stay" if prediction == 0 else "The customer will leave")
