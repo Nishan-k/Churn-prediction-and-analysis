@@ -12,6 +12,7 @@ from customer_churn_ml.shap import create_clean_shap_dashboard, aggregated_shap_
 from customer_health import customer_health_dashboard, display_dashboard
 import joblib
 from ui_components.generate_report import get_report
+from ui_components.pdf_generator import save_report_as_pdf
 
 
 
@@ -324,17 +325,27 @@ if page == "📑 Generate Report":
     else:
         prediction = st.session_state.prediction_result
         customer_data = st.session_state.customer_data
-        aggregated_features = aggregated_shap_features(customer_data=customer_data)
+        # aggregated_features = aggregated_shap_features(customer_data=customer_data)
         st.write(customer_data)
         st.write("")
-        st.write(aggregated_features)
+        # st.write(aggregated_features)
         st.write("The Customer will stay" if prediction == 0 else "The customer will leave")
         st.write("")
         st.write("")
        
-        if st.button("Generate Report"):
-            report = get_report(shap_values=aggregated_features, predictions=prediction)
-            st.write(report)
+        # if st.button("Generate Report"):
+        #     report = get_report(shap_values=aggregated_features, predictions=prediction, customer_data=customer_data)
+        #     st.write(report)
+
+        #     # A function to allow the user to download the generated report as a PDF file:
+        #     pdf_path = save_report_as_pdf(report)
+        #     with open(pdf_path, "rb") as file:
+        #         st.download_button(
+        #             label="Download as PDF",
+        #             data=file,
+        #             file_name="Customer_churn_report.pdf",
+        #             mime="application/pdf"
+        #         )
             
 
 ################################

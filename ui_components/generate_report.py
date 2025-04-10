@@ -23,14 +23,20 @@ def system_prompt():
     1. **Inputs**: 
        - A dictionary of SHAP values where positive values increase churn risk and negative values decrease it.
        - A binary churn prediction (1 = High Risk of Churn, 0 = Low Risk of Non-Churn).
+       - A dicionary of input features that the model uses to predict whether a customer will Churn or Non-Churn. These were the
+       features used to train this machine learning model.
 
     2. **Output Structure**:
        - **Title**: "Customer Churn Risk Report"
+
        - **Prediction**: State "High Risk (Predicted to Churn)" for prediction=1 or "Low Risk (Predicted to Retain)" for prediction=0.
+
        - **Top Drivers**: List the 3-5 most impactful features based on absolute SHAP values. For each feature:
           * Indicate whether it increases risk (positive SHAP) or decreases risk (negative SHAP)
           * Quantify the impact (e.g., "increases churn risk by approximately X%")
+
        - **Business Interpretation**: Explain what each top driver means in business terms.
+
        - **Recommendations**: Suggest 2-3 specific, actionable interventions based on the top drivers.
 
     3. **Style**:
@@ -42,7 +48,7 @@ def system_prompt():
     return system_prompt
 
 
-def user_prompt(shap_values, predictions):
+def user_prompt(shap_values, predictions, customer_data):
     # Format the prediction in a clearer way
     prediction_text = "1 (Will Churn)" if predictions == 1 else "0 (Will Not Churn)"
     
@@ -53,6 +59,7 @@ def user_prompt(shap_values, predictions):
     Generate a customer churn report using:
     - SHAP values: {sorted_shap}
     - Churn prediction: {prediction_text}
+    - Features used for the prediction: {customer_data}
 
     Additional context:
     - Customer tenure: 5 months
@@ -68,9 +75,9 @@ def user_prompt(shap_values, predictions):
     """
     return user_prompt
 
-def get_report(shap_values, predictions):
+def get_report(shap_values, predictions, customer_data):
     system = system_prompt()
-    user = user_prompt(shap_values=shap_values, predictions=predictions)
+    user = user_prompt(shap_values=shap_values, predictions=predictions, customer_data=customer_data)
     input_data = [
         {"role": "system", "content": system},
         {"role": "user", "content": user}
@@ -79,6 +86,7 @@ def get_report(shap_values, predictions):
     response = openai.chat.completions.create(
         model=MODEL,
         messages=input_data
+        
     )
 
     return response.choices[0].message.content
