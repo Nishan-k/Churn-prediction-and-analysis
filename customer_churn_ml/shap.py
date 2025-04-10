@@ -23,8 +23,14 @@ def aggregated_shap_features(customer_data, model=model, background_data=None):
     final_model = model.named_steps['model']
     preprocessor = model.named_steps['preprocessor']
     
+    
+    if isinstance(customer_data, dict):
+        customer_df = pd.DataFrame([customer_data])
+    else:
+        customer_df = customer_data
+
     # Transform customer data:
-    X_transformed = preprocessor.transform(customer_data)
+    X_transformed = preprocessor.transform(customer_df)
     if hasattr(X_transformed, "toarray"):
         X_transformed = X_transformed.toarray()
     
@@ -71,7 +77,7 @@ def aggregated_shap_features(customer_data, model=model, background_data=None):
             base_value = shap_values.base_values
     
     # Feature mapping
-    original_features = customer_data.columns.tolist()
+    original_features = customer_df.columns.tolist()
     
     feature_mapping = {}
     for i, feature_name in enumerate(feature_names):
@@ -100,8 +106,8 @@ def aggregated_shap_features(customer_data, model=model, background_data=None):
     # Get customer values
     customer_values = {}
     for feature in original_features:
-        if feature in customer_data.columns:
-            customer_values[feature] = str(customer_data.iloc[0][feature])
+        if feature in customer_df.columns:
+            customer_values[feature] = str(customer_df.iloc[0][feature])
     
    
     sorted_dict = dict(sorted(aggregated_shap.items(), key=lambda item: item[1], reverse=True))
@@ -128,9 +134,14 @@ def create_clean_shap_dashboard(customer_data, model=model, background_data=None
     # Extract model components
     final_model = model.named_steps['model']
     preprocessor = model.named_steps['preprocessor']
+
+    if isinstance(customer_data, dict):
+        customer_df = pd.DataFrame([customer_data])
+    else:
+        customer_df = customer_data
     
     # Transform customer data
-    X_transformed = preprocessor.transform(customer_data)
+    X_transformed = preprocessor.transform(customer_df)
     if hasattr(X_transformed, "toarray"):
         X_transformed = X_transformed.toarray()
     
@@ -177,7 +188,7 @@ def create_clean_shap_dashboard(customer_data, model=model, background_data=None
             base_value = shap_values.base_values
     
     # Feature mapping
-    original_features = customer_data.columns.tolist()
+    original_features = customer_df.columns.tolist()
     
     feature_mapping = {}
     for i, feature_name in enumerate(feature_names):
@@ -206,8 +217,8 @@ def create_clean_shap_dashboard(customer_data, model=model, background_data=None
     # Get customer values
     customer_values = {}
     for feature in original_features:
-        if feature in customer_data.columns:
-            customer_values[feature] = str(customer_data.iloc[0][feature])
+        if feature in customer_df.columns:
+            customer_values[feature] = str(customer_df.iloc[0][feature])
     
     # Sort features by absolute impact
     sorted_features = sorted(aggregated_shap.keys(), 
@@ -274,8 +285,8 @@ def create_clean_shap_dashboard(customer_data, model=model, background_data=None
             cell.set_facecolor('#f7f7f7')
     
     # ===== PREDICTION TITLE =====
-    prediction = model.predict(customer_data)[0]
-    prediction_proba = model.predict_proba(customer_data)[0][1]
+    prediction = model.predict(customer_df)[0]
+    prediction_proba = model.predict_proba(customer_df)[0][1]
     fig.suptitle(
     f"Customer Churn Analysis "
     f"Prediction: {'Churn' if prediction == 1 else 'No Churn'} "

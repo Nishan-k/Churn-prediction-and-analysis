@@ -13,6 +13,7 @@ from customer_health import customer_health_dashboard, display_dashboard
 import joblib
 from ui_components.generate_report import get_report
 from ui_components.pdf_generator import save_report_as_pdf
+import os
 
 
 
@@ -40,6 +41,7 @@ if 'input_features' not in st.session_state:
     st.session_state.input_features = None
 if 'shap_plot' not in st.session_state:
     st.session_state.shap_plot = None
+
 
 total_churn_count = get_churn_count()
 total_customers = get_total_customer_counts()
@@ -316,37 +318,112 @@ if page == "📖 Explain":
 #         st.dataframe(st.session_state.customer_data)
 
 
+# if page == "📑 Generate Report":
+#     st.title("Generate a report for the stakeholder using LLMs")
+#     if st.session_state.customer_data is None:
+#         st.warning("Please make a prediction first!")
+#         if st.button("Go to Prediction Page", on_click=navigate_to_predict):
+#              pass  
+#     else:
+#         prediction = st.session_state.prediction_result
+#         customer_data = st.session_state.customer_data
+#         aggregated_features = aggregated_shap_features(customer_data=customer_data)
+#         st.write(customer_data)
+#         st.write("")
+#         st.write(aggregated_features)
+#         st.write("The Customer will stay" if prediction == 0 else "The customer will leave")
+#         st.write("")
+#         st.write("")
+       
+#         if st.button("Generate Report"):
+#             report = get_report(shap_values=aggregated_features, predictions=prediction, customer_data=customer_data)
+#             st.write(report)
+
+#             # A function to allow the user to download the generated report as a PDF file:
+#             pdf_path = save_report_as_pdf(report)
+        
+#             if pdf_path and os.path.exists(pdf_path):
+#                 try:
+#                     with open(pdf_path, "rb") as file:
+#                         st.download_button(
+#                             label="Download as PDF",
+#                             data=file,
+#                             file_name="Customer_churn_report.pdf",
+#                             mime="application/pdf"
+#                         )
+#                 finally:
+#                     try:
+#                         os.unlink(pdf_path)  # Delete the temp file
+#                     except:
+#                         pass
+#             else:
+#                 st.error("Failed to generate PDF file")
+
 if page == "📑 Generate Report":
-    st.title("Generate a report for the stakeholder using LLMs")
+    st.title("Generate Report using LLM:")
     if st.session_state.customer_data is None:
         st.warning("Please make a prediction first!")
         if st.button("Go to Prediction Page", on_click=navigate_to_predict):
-             pass  
+                pass
     else:
         prediction = st.session_state.prediction_result
         customer_data = st.session_state.customer_data
-        # aggregated_features = aggregated_shap_features(customer_data=customer_data)
-        st.write(customer_data)
-        st.write("")
-        # st.write(aggregated_features)
-        st.write("The Customer will stay" if prediction == 0 else "The customer will leave")
-        st.write("")
-        st.write("")
-       
-        # if st.button("Generate Report"):
-        #     report = get_report(shap_values=aggregated_features, predictions=prediction, customer_data=customer_data)
-        #     st.write(report)
+        aggregated_features = aggregated_shap_features(customer_data=customer_data)
 
-        #     # A function to allow the user to download the generated report as a PDF file:
-        #     pdf_path = save_report_as_pdf(report)
-        #     with open(pdf_path, "rb") as file:
-        #         st.download_button(
-        #             label="Download as PDF",
-        #             data=file,
-        #             file_name="Customer_churn_report.pdf",
-        #             mime="application/pdf"
-        #         )
-            
+        # Initialize session state
+        if 'report_generated' not in st.session_state:
+            st.session_state.report_generated = False
+            st.session_state.report_content = None
+            st.session_state.pdf_path = None
+
+        if st.session_state.customer_data is None:
+            st.warning("Please make a prediction first!")
+            if st.button("Go to Prediction Page", on_click=navigate_to_predict):
+                pass
+        else:
+            # Show generate button only if report not already generated
+            if not st.session_state.report_generated:
+                if st.button("Generate Report"):
+                    with st.spinner("Generating report..."):
+                        # Generate and store in session state
+                        st.session_state.report_content = get_report(
+                            shap_values=aggregated_features,
+                            predictions=prediction,
+                            customer_data=customer_data
+                        )
+                        st.session_state.pdf_path = save_report_as_pdf(st.session_state.report_content)
+                        st.session_state.report_generated = True
+                    st.rerun()  # Force update to show results
+
+            # Display after generation
+            if st.session_state.report_generated:
+                st.write(st.session_state.report_content)
+                
+                if st.session_state.pdf_path and os.path.exists(st.session_state.pdf_path):
+                    try:
+                        with open(st.session_state.pdf_path, "rb") as file:
+                            # Use key parameter to maintain button state
+                            st.download_button(
+                                label="📥 Download as PDF",
+                                data=file,
+                                file_name="Customer_churn_report.pdf",
+                                mime="application/pdf",
+                                key="download_pdf"
+                            )
+                    finally:
+                        # Cleanup only when leaving the page
+                        pass
+
+                # # Add "New Report" button
+                # if st.button("🔄 Generate New Report"):
+                #     st.session_state.report_generated = False
+                #     st.session_state.report_content = None
+                #     if st.session_state.pdf_path and os.path.exists(st.session_state.pdf_path):
+                #         os.unlink(st.session_state.pdf_path)
+                #     st.rerun()
+
+
+
 
 ################################
 ### ABOUT PAGE:
