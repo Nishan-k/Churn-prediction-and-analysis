@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import json
 import uuid 
-from customer_churn_ml.shap import create_clean_shap_dashboard, aggregated_shap_features
+from customer_churn_ml.shap_calc import create_clean_shap_dashboard, aggregated_shap_features
 from customer_health import customer_health_dashboard, display_dashboard
 import joblib
 from ui_components.generate_report import get_report

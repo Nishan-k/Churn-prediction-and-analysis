@@ -1,7 +1,7 @@
 import streamlit as st
 from customer_churn_ml.data_loader import get_churn_distribution, get_churn_count, get_total_customer_counts
 import pandas as pd
-from customer_churn_ml.shap import create_clean_shap_dashboard
+from customer_churn_ml.shap_calc import create_clean_shap_dashboard
 
 total_churn_count = get_churn_count()
 total_customers = get_total_customer_counts()
