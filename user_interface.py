@@ -227,6 +227,7 @@ if page == "📊 Predict":
                     st.session_state.dashboard_displayed = False
                     st.session_state.customer_data = None
                     st.session_state.prediction_result = None
+                    st.session_state.res = None
                     st.rerun()
 
     if not st.session_state.get('dashboard_displayed', False):
@@ -294,6 +295,7 @@ if page == "📊 Predict":
             res = requests.post(url="http://127.0.0.1:8000/predict", json=input_features)
             if res.status_code == 200:
                 customer_health_dashboard(res, input_features=input_features)
+                
             
 
 
@@ -305,7 +307,7 @@ if page == "📖 Explain":
         if st.button("Go to Prediction Page", on_click=navigate_to_predict):
              pass  
     else:
-        st.dataframe(st.session_state.customer_data)
+        st.write("hello")
         
 
 # if page == "💡 Recommendations":
